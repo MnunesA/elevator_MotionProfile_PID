@@ -55,15 +55,16 @@ public class TrapezoidCommandSetGoal extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (tps.getLimitSwitch_UP().get() == limitSwitchStatus_UP) {
+    tps.getElevatorMotorsGroup().set(0.0); 
+
+    if (tps.getLimitSwitch_UP().get() == limitSwitchStatus_UP || tps.getEncoder().get() > ConstantsElevator.ENCODER_FINAL) {
+      tps.getElevatorMotorsGroup().set(0.0); 
       new TrapezoidCommandSetGoal(tps, ConstantsElevator.ENCODER_FINAL).schedule();
 
-    } else if (tps.getLimitSwitch_DOWN().get() == limitSwitchStatus_DOWN){
-      new TrapezoidCommandSetGoal(tps, ConstantsElevator.ENCODER_INITIAL).schedule();
-      
-    } else {
+    } else if (tps.getLimitSwitch_DOWN().get() == limitSwitchStatus_DOWN || tps.getEncoder().get() < ConstantsElevator.ENCODER_INITIAL){
       tps.getElevatorMotorsGroup().set(0.0);
-    }
+      new TrapezoidCommandSetGoal(tps, ConstantsElevator.ENCODER_INITIAL).schedule();
+    }  
   }
 
   @Override
